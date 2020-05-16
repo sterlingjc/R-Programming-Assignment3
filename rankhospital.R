@@ -1,5 +1,4 @@
 
-
 rankhospital <- function(state, outcome, num = "best") {
   ## Read outcome data
   
@@ -59,7 +58,7 @@ rankhospital <- function(state, outcome, num = "best") {
   
   
   
-  if( !(is.numeric(num))   | !(outcome %in% outcomes) ) {
+  if( !(is.numeric(num))   & !(outcome %in% outcomes) ) {
     
     stop('invalid num')
     
@@ -74,10 +73,8 @@ rankhospital <- function(state, outcome, num = "best") {
   
   outcome_df <- outcome_df[ outcome_df$state==state  ,  ]
   
-  outcome_df <- outcome_df[ order( outcome_df[ , outcome], outcome_df$state ) , ]
+  outcome_df <- outcome_df[ order( outcome_df[ , outcome], outcome_df$name ) , ]
   
-  
-  row.names(outcome_df) <- 1:nrow(outcome_df)
   
   if(num == 'WORST'){
     
@@ -85,5 +82,14 @@ rankhospital <- function(state, outcome, num = "best") {
     
   }
   
+  if(num == 'BEST'){
+    
+    num <-1
+    
+  }
+  
+  outcome_df[ num,  'name']
+  
+ 
   
 }
