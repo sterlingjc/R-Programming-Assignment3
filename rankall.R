@@ -1,5 +1,5 @@
 
-rankhospital <- function(state, outcome, num = "best") {
+rankall <- function(outcome, num = "best") {
   ## Read outcome data
   
   if( is.character(num) ){
@@ -10,13 +10,12 @@ rankhospital <- function(state, outcome, num = "best") {
   if(num == 'BEST'){
     
     num <-1
-      
+    
   }
   
   
   num_args <- c('BEST', 'WORST')
   
-  state <- trimws(toupper(state))
   outcome <- trimws(toupper(outcome))
   
   outcomes <- c('HEART ATTACK', 'HEART FAILURE', 'PNEUMONIA')
@@ -41,14 +40,7 @@ rankhospital <- function(state, outcome, num = "best") {
   states <- unique(outcome_df$state)
   
   
-  ## Check that state and outcome are valid
-  
-  if(!(state %in% states)) {
-    
-    stop('invalid state')  
-    
-  }
-  
+  ## Check that num and outcome are valid
   
   if(!(outcome %in% outcomes)) {
     
@@ -64,27 +56,33 @@ rankhospital <- function(state, outcome, num = "best") {
     
   }
   
-
   
-  ## Return hospital name in that state with the given rank
-  ## 30-day death rate
+  
+  ## For each state, find the hospital of the given rank
+  
   
   outcome_df <- outcome_df[!is.na(outcome_df[, outcome]) , c(1,2, 2+which(outcomes==outcome)   ) ]
   
-  outcome_df <- outcome_df[ outcome_df$state==state  ,  ]
-  
-  outcome_df <- outcome_df[ order( outcome_df[ , outcome], outcome_df$name ) , ]
-  
-  
-  if(num == 'WORST'){
+  if (num=='WORST') {
+    outcome_df <- outcome_df[ order(outcome_df$state , -outcome_df[ , outcome], outcome_df$name ) , ]
+    num <- 1
     
-    num <-nrow(outcome_df)
+  } else {
+    outcome_df <- outcome_df[ order(outcome_df$state , outcome_df[ , outcome], outcome_df$name ) , ]
     
   }
   
+  list_of_data_frames <- split(outcome_df, outcome_df$state)
   
-  outcome_df[ num,  'name']
+  state_list <- sapply(  list_of_data_frames , function(x){ x$name[num]   })
   
- 
+  ## Return a data frame with the hospital names and the
+  ## (abbreviated) state name
   
-}
+  result <- as.data.frame(cbind( state_list , names(state_list)))
+  
+  names(result) <- c('state', 'name')
+  
+  result
+  
+  }
