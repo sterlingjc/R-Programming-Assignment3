@@ -82,6 +82,9 @@ rankall <- function(outcome, num = "best") {
   result <- as.data.frame(cbind( state_list , names(state_list)))
   
   names(result) <- c('state', 'name')
+
+  
+  rownames(result) <- names(state_list)
   
   result
   
